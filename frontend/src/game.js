@@ -1,4 +1,3 @@
-//var hostAddress = 'http://localhost:5000';
 var hostAddress = 'http://localhost:8080';
 //python3 -m http.server --bind 0.0.0.0 8081
 
@@ -8,7 +7,6 @@ var playerNick = parametr.split('=')[1];
 
 function getOpponent() {
     var xhr = new XMLHttpRequest();
-    //xhr.open('GET', 'http://localhost:5000/players', true);
     xhr.open('GET', hostAddress + '/players', true);
     xhr.setRequestHeader('Content-Type', 'application/json');
     xhr.send();
