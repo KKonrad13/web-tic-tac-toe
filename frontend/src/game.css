@@ -1,0 +1,87 @@
+
+
+.board-container {
+    position: relative; 
+}
+
+.player-info,
+.opponent-info {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.topText{
+    color: #ffffff;
+    font-size: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+body{
+    background-color: #222222;
+    font-family: Arial, sans-serif;
+}
+
+.container{
+    text-align: center;
+    position: relative; 
+}
+
+.button{
+    border: none;
+    outline: none;
+    cursor: pointer;
+    width: 376px;
+    height: 100px;
+    font-size: 42px;
+    color: #121212;
+    font-weight: 800;
+    border-radius: 4px;
+    background:  #eeeeee;
+    margin-top: 12px;
+}
+
+.cell{
+    font-size: 60px;
+    align-items: center;
+    justify-content: center; 
+    width: 120px;
+    height: 120px;
+    text-align: center;
+    display: flex;
+    background: #dddddd;
+    border-radius: 4px;
+    cursor: pointer;
+    overflow: hidden;
+    margin: 8px 4px 8px 4px;
+}
+
+.board{
+    display: flex;
+    margin: auto;
+    width: 384px;
+    height: 384px;
+}
+
+.text{
+    color: #dddddd;
+    justify-content: center;
+    align-items: center;
+    font-size: 25px;
+    display: flex;
+}
+
+.cell img{
+    width: calc(100% - 20px); 
+    margin: 10px;
+}
+
+.player-info {
+    left: 10%; 
+}
+  
+.opponent-info {
+    right: 10%; 
+}
