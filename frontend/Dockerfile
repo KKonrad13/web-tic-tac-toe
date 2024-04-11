@@ -6,5 +6,9 @@ WORKDIR /home/stud
 
 COPY src/ .
 
+RUN sed -i "s/localhost/$ip/g" index.html && \
+    sed -i "s/localhost/$ip/g" game.js
+
+
 ENTRYPOINT ["busybox"]
 CMD ["httpd", "-f", "-v", "-p", "3000"]
