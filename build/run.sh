@@ -1,2 +1,2 @@
 #!/bin/bash
-echo "This script should start your application"
+docker compose up -d 
