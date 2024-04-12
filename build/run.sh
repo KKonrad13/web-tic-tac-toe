@@ -1,3 +1,3 @@
 #!/bin/bash
 export IP=localhost
-docker compose up -d 
+docker compose up --build

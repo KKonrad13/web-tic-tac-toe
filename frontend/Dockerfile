@@ -1,13 +1,15 @@
 FROM busybox:1.35
 
+ARG IP=$IP
+
 RUN adduser -D stud
 USER stud
 WORKDIR /home/stud
 
 COPY src/ .
 
-RUN sed -i "s/localhost/$ip/g" index.html && \
-    sed -i "s/localhost/$ip/g" game.js
+RUN sed -i "s/localhost/$IP/g" index.html && \
+    sed -i "s/localhost/$IP/g" game.js
 
 
 ENTRYPOINT ["busybox"]
