@@ -1,0 +1,18 @@
+version: '2.0'
+services:
+  frontend:
+    image: ttt_front
+    build:
+      context: frontend
+      dockerfile: Dockerfile
+      args:
+        - ip=${IP}
+    ports:
+      - 8081:3000
+  backend:
+    image: ttt_back
+    build:
+      context: backend
+      dockerfile: Dockerfile
+    ports:
+      - 8080:8080
