@@ -9,7 +9,8 @@ WORKDIR /home/stud
 COPY src/ .
 
 RUN sed -i "s/localhost/$IP/g" index.html && \
-    sed -i "s/localhost/$IP/g" game.js
+    sed -i "s/localhost/$IP/g" game.js && \
+    sed -i "s/localhost/$IP/g" authorize.js
 
 
 ENTRYPOINT ["busybox"]
