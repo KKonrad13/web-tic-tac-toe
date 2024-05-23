@@ -4,14 +4,17 @@ var hostAddress = 'http://localhost:8080';
 
 var parametr = window.location.search.substring(1);
 var playerNick = parametr.split('=')[1];
-
+var isAuthorized = true;
+let nIntervId;
 function getOpponent() {
     var xhr = new XMLHttpRequest();
     xhr.open('GET', hostAddress + '/players', true);
     xhr.setRequestHeader('Content-Type', 'application/json');
+    var accessToken = localStorage.getItem('accessToken');
+    xhr.setRequestHeader('Authorization', 'Bearer ' + accessToken);
     xhr.send();
 
-    xhr.onreadystatechange = function() {
+    xhr.onreadystatechange = function () {
         if (xhr.readyState === XMLHttpRequest.DONE) {
             if (xhr.status !== 200) {
                 console.error('Fetching players error!');
@@ -20,19 +23,19 @@ function getOpponent() {
             var data = JSON.parse(xhr.responseText);
             var players = data.players;
             if (players.p1 == playerNick || players.p2 == playerNick) {
-                if(players.p2 === null){
-                    document.getElementById('player_info').innerHTML = players.p1 + '\'s symbol: X';   
+                if (players.p2 === null) {
+                    document.getElementById('player_info').innerHTML = players.p1 + '\'s symbol: X';
                     document.getElementById('opponent_info').innerHTML = 'Waiting for an opponent...';
                 }
-                else if (players.p2 === playerNick){
+                else if (players.p2 === playerNick) {
                     document.getElementById('opponent_info').innerHTML = players.p1 + '\'s symbol: X';
-                    document.getElementById('player_info').innerHTML = players.p2 + '\'s symbol: O';   
+                    document.getElementById('player_info').innerHTML = players.p2 + '\'s symbol: O';
                 }
                 else {
                     document.getElementById('player_info').innerHTML = players.p1 + '\'s symbol: X';
-                    document.getElementById('opponent_info').innerHTML = players.p2 + '\'s symbol: O';                               
+                    document.getElementById('opponent_info').innerHTML = players.p2 + '\'s symbol: O';
                 }
-            }               
+            }
         }
     };
 
@@ -40,14 +43,17 @@ function getOpponent() {
 
 function makeMove(move) {
     var xhr = new XMLHttpRequest();
-    xhr.open('POST', hostAddress +'/send_move', true);
+    xhr.open('POST', hostAddress + '/send_move', true);
     xhr.setRequestHeader('Content-Type', 'application/json');
-    xhr.send(JSON.stringify({move: move, playerNick: playerNick}));       
+    var accessToken = localStorage.getItem('accessToken');
+    xhr.setRequestHeader('Authorization', 'Bearer ' + accessToken);
+    xhr.send(JSON.stringify({ move: move, playerNick: playerNick }));
 
-    xhr.onreadystatechange = function() {
+    xhr.onreadystatechange = function () {
         if (xhr.readyState === XMLHttpRequest.DONE) {
             if (xhr.status !== 200) {
                 console.error('Move error!');
+                isAuthorized = false;
                 return
             }
             updateBoard();
@@ -57,14 +63,17 @@ function makeMove(move) {
 
 function updateBoard() {
     var xhr = new XMLHttpRequest();
-    xhr.open('GET', hostAddress +'/board', true);
+    xhr.open('GET', hostAddress + '/board', true);
     xhr.setRequestHeader('Content-Type', 'application/json');
+    var accessToken = localStorage.getItem('accessToken');
+    xhr.setRequestHeader('Authorization', 'Bearer ' + accessToken);
     xhr.send();
 
-    xhr.onreadystatechange = function() {
+    xhr.onreadystatechange = function () {
         if (xhr.readyState === XMLHttpRequest.DONE) {
             if (xhr.status !== 200) {
                 console.error('Getting board error!');
+                isAuthorized = false;
                 return
             }
             var data = JSON.parse(xhr.responseText);
@@ -81,34 +90,37 @@ function renderBoard(board) {
         if (board[i] === '') {
             cells[i].setAttribute('onclick', 'makeMove(' + i + ')');
         } else if (board[i] === 'x') {
-            cells[i].innerHTML  = `<img src='x_image.png'>`;
+            cells[i].innerHTML = `<img src='x_image.png'>`;
         } else if (board[i] === 'o') {
-            cells[i].innerHTML  = `<img src='o_image.png'>`;
+            cells[i].innerHTML = `<img src='o_image.png'>`;
         }
     }
 }
 
 function checkWin() {
     var xhr = new XMLHttpRequest();
-    xhr.open('GET', hostAddress +'/winner', true);
+    xhr.open('GET', hostAddress + '/winner', true);
     xhr.setRequestHeader('Content-Type', 'application/json');
+    var accessToken = localStorage.getItem('accessToken');
+    xhr.setRequestHeader('Authorization', 'Bearer ' + accessToken);
     xhr.send();
 
-    xhr.onreadystatechange = function() {
+    xhr.onreadystatechange = function () {
         if (xhr.readyState === XMLHttpRequest.DONE) {
             if (xhr.status !== 200) {
                 console.error('Error getting winner');
+                isAuthorized = false;
                 return
             }
             var data = JSON.parse(xhr.responseText);
             var winner = data.winner;
-            if(winner == playerNick){
+            if (winner == playerNick) {
                 document.getElementById('topInfo').innerHTML = 'You won!';
             }
-            else if(winner == 'draw'){
+            else if (winner == 'draw') {
                 document.getElementById('topInfo').innerHTML = 'Draw!';
             }
-            else if(winner != 'None'){
+            else if (winner != 'None') {
                 document.getElementById('topInfo').innerHTML = 'You lost!';
             }
         }
@@ -116,16 +128,19 @@ function checkWin() {
 
 }
 
-function endGame(){
+function endGame() {
     var xhr = new XMLHttpRequest();
     xhr.open('POST', hostAddress + '/end_current_game', true);
     xhr.setRequestHeader('Content-Type', 'application/json');
-    xhr.send();       
+    var accessToken = localStorage.getItem('accessToken');
+    xhr.setRequestHeader('Authorization', 'Bearer ' + accessToken);
+    xhr.send();
 
-    xhr.onreadystatechange = function() {
+    xhr.onreadystatechange = function () {
         if (xhr.readyState === XMLHttpRequest.DONE) {
             if (xhr.status !== 200) {
                 console.error('Error ending game');
+                isAuthorized = false;
                 return
             }
             checkEndGame();
@@ -133,16 +148,19 @@ function endGame(){
     };
 }
 
-function checkEndGame(){
+function checkEndGame() {
     var xhr = new XMLHttpRequest();
-    xhr.open('GET', hostAddress +'/game_running', true);
+    xhr.open('GET', hostAddress + '/game_running', true);
     xhr.setRequestHeader('Content-Type', 'application/json');
+    var accessToken = localStorage.getItem('accessToken');
+    xhr.setRequestHeader('Authorization', 'Bearer ' + accessToken);
     xhr.send();
 
-    xhr.onreadystatechange = function() {
+    xhr.onreadystatechange = function () {
         if (xhr.readyState === XMLHttpRequest.DONE) {
             if (xhr.status !== 200) {
                 console.error('Error checking game end');
+                isAuthorized = false;
                 return
             }
             var data = JSON.parse(xhr.responseText);
@@ -154,11 +172,17 @@ function checkEndGame(){
     };
 }
 
-function updateGame(){
+function updateGame() {
     checkWin()
     getOpponent()
     updateBoard()
     checkEndGame()
+    if (!isAuthorized) {
+        clearInterval(nIntervId);
+        nIntervId = null;
+        document.getElementById('main_div').innerHTML = '<h1 class="topText">You are not authorized!</h1>';
+        
+    }
 }
 
-setInterval(updateGame, 1000);
+nIntervId = setInterval(updateGame, 1000);

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,48 +10,82 @@
 
 <body>
     <div class="container">
-      <h1 class="topText">Tic Tac Toe</h1>
-         <input class="input" type="text" id="nickInput" placeholder="Enter your nickname">
-         <div></div>
-         <button class="button" onclick="registerPlayer()">PLAY</button>
-  </div>
+        <h1 class="topText">Tic Tac Toe</h1>
+        <!-- <input class="input" type="text" id="nickInput" placeholder="Enter your nickname"> -->
+        <div id="play_button_div"></div>
+
+        <button class="button" onclick="authorize()">AUTHORIZE</button>
+        <div id="logout_button_div"></div>
+
+    </div>
 
     <script>
         var playerNick = null;
         //var hostAddress = 'http://localhost:5000';
         var hostAddress = 'http://localhost:8080';
-
+        var accessToken = localStorage.getItem('accessToken');
+        if (accessToken != "" || accessToken === "null") {
+            document.getElementById('play_button_div').innerHTML = '<button class="button" onclick="registerPlayer()">PLAY</button>';
+            document.getElementById('logout_button_div').innerHTML = '<button class="button" onclick="logout()">LOGOUT</button>';
+        } else {
+            document.getElementById('play_button_div').innerHTML = "";
+            document.getElementById('logout_button_div').innerHTML = "";
+        }
         function registerPlayer() {
-            var nick = document.getElementById('nickInput').value;
-            if (nick) {
-                var xhr = new XMLHttpRequest();
-                xhr.open('POST', hostAddress + '/register', true);
-                xhr.setRequestHeader('Content-Type', 'application/json');
+            var xhr = new XMLHttpRequest();
+            var accessToken = localStorage.getItem('accessToken');
 
-                xhr.onreadystatechange = function() {
-                    if (xhr.readyState === XMLHttpRequest.DONE) {
-                        if (xhr.status === 200) {
-                            var data = JSON.parse(xhr.responseText);
-                            if (data.status === 'registered') {
-                                window.location = "game.html?parametr=" + nick;
-                            }else if (data.status === 'full') {
-                                alert('Game is full. Please try again later.');
-                            }else if (data.status === 'taken') {
-                                alert('This nick is taken. Please try again with different nick.');
-                            }
-                        } else {
-                            console.error('Error registering player');
+            xhr.open('POST', hostAddress + '/register_player', true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.setRequestHeader('Authorization', 'Bearer ' + accessToken);
+
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === XMLHttpRequest.DONE) {
+                    if (xhr.status === 200) {
+                        var data = JSON.parse(xhr.responseText);
+                        if (data.status === 'registered') {
+                            window.location = "game.html?parametr=" + data.nick;
+                        } else if (data.status === 'full') {
+                            alert('Game is full. Please try again later.');
+                        } else if (data.status === 'taken') {
+                            alert('This nick is taken. Please try again with different nick.');
                         }
+                    } else if (xhr.status === 403) {
+                        alert('You are unauthorized.');
+                    } else {
+                        console.error('Error registering player');
                     }
-                };
-                
-                playerNick = nick;
-                xhr.send(JSON.stringify({nick: nick}));
-            } else {
-                alert('Please enter your nickname.');
-            }
-        }    
+                }
+            };
+
+            xhr.send();
+        }
+
+        function logout() {
+            var xhr = new XMLHttpRequest();
+            var accessToken = localStorage.getItem('accessToken');
+
+            xhr.open('POST', hostAddress + '/logout', true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.setRequestHeader('Authorization', 'Bearer ' + accessToken);
+            localStorage.setItem('accessToken', "");
+            localStorage.setItem('refreshToken', "");
+            location.reload();
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === XMLHttpRequest.DONE) {
+                    if (xhr.status != 200) {
+                        console.error('Log out error.');
+                    }
+                }
+            };
+
+            xhr.send(JSON.stringify({ access_token: access_token }));
+        }
+
+        function authorize() {
+            window.location = "authorize.html";
+        } 
     </script>
 </body>
-</html>
 
+</html>
