@@ -24,7 +24,7 @@
         //var hostAddress = 'http://localhost:5000';
         var hostAddress = 'http://localhost:8080';
         var accessToken = localStorage.getItem('accessToken');
-        if (accessToken != "" || accessToken === null) {
+        if (accessToken != "" || accessToken != null) {
             document.getElementById('play_button_div').innerHTML = '<button class="button" onclick="registerPlayer()">PLAY</button>';
             document.getElementById('logout_button_div').innerHTML = '<button class="button" onclick="logout()">LOGOUT</button>';
         } else {
