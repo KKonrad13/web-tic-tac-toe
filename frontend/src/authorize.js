@@ -72,10 +72,10 @@ function login() {
 
 function verify() {
     var nick = localStorage.getItem('nickToVerify');
-    var nickInput = document.getElementById("nickInputVerify").value;
-    nickInput = nick;
+    var nickInput = document.getElementById("nickInputVerify");
+    nickInput.value = nick;
     var code = document.getElementById('codeInputVerify').value;
-    if (nickInput && code) {
+    if (nickInput.value && code) {
         var xhr = new XMLHttpRequest();
         xhr.open('POST', hostAddress + '/verify', true);
         xhr.setRequestHeader('Content-Type', 'application/json');
@@ -96,7 +96,7 @@ function verify() {
             }
         };
 
-        xhr.send(JSON.stringify({ nick: nickInput, code: code }));
+        xhr.send(JSON.stringify({ nick: nickInput.value, code: code }));
     } else {
         alert('Enter the correct code.');
     }
