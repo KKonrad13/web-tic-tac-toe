@@ -11,10 +11,8 @@
 <body>
     <div class="container">
         <h1 class="topText">Tic Tac Toe</h1>
-        <!-- <input class="input" type="text" id="nickInput" placeholder="Enter your nickname"> -->
         <div id="play_button_div"></div>
-
-        <button class="button" onclick="authorize()">AUTHORIZE</button>
+        <div id="authorize_button_div"></div>
         <div id="logout_button_div"></div>
 
     </div>
@@ -27,9 +25,11 @@
         if (accessToken != "" && accessToken != null && accessToken != "null") {
             document.getElementById('play_button_div').innerHTML = '<button class="button" onclick="registerPlayer()">PLAY</button>';
             document.getElementById('logout_button_div').innerHTML = '<button class="button" onclick="logout()">LOGOUT</button>';
+            document.getElementById('authorize_button_div').innerHTML = '';
         } else {
             document.getElementById('play_button_div').innerHTML = "";
             document.getElementById('logout_button_div').innerHTML = "";
+            document.getElementById('authorize_button_div').innerHTML = '<button class="button" onclick="authorize()">AUTHORIZE</button>';
         }
         function registerPlayer() {
             var xhr = new XMLHttpRequest();
@@ -44,7 +44,8 @@
                     if (xhr.status === 200) {
                         var data = JSON.parse(xhr.responseText);
                         if (data.status === 'registered') {
-                            window.location = "game.html?parametr=" + data.nick;
+                            localStorage.setItem('nick', data.nick)
+                            window.location = "game.html";
                         } else if (data.status === 'full') {
                             alert('Game is full. Please try again later.');
                         } else if (data.status === 'taken') {

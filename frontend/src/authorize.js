@@ -1,4 +1,7 @@
 var hostAddress = 'http://localhost:8080';
+
+document.getElementById('navigate_to_verify_button_div').innerHTML = "";
+
 function register() {
     var nick = document.getElementById('nickInputRegister').value;
     var email = document.getElementById('emailInputRegister').value;
@@ -11,7 +14,9 @@ function register() {
         xhr.onreadystatechange = function () {
             if (xhr.readyState === XMLHttpRequest.DONE) {
                 if (xhr.status === 200) {
-                    alert("Register succesful")
+                    alert("Register succesful");
+                    localStorage.setItem('nickToVerify', nick);
+                    document.getElementById('navigate_to_verify_button_div').innerHTML = '<button class="button" onclick="navigateToVerify()">VERIFY</button>';
                 } else {
                     try {
                         var response = JSON.parse(xhr.responseText);
@@ -66,7 +71,11 @@ function login() {
 }
 
 function verify() {
-    var nick = document.getElementById('nickInputVerify').value;
+    var nick = localStorage.getItem('nickToVerify');
+    if (nick === "" || nick === null && nick === "null"){
+        alert('ERROR. Nick not found.');
+        return;
+    }
     var code = document.getElementById('codeInputVerify').value;
     if (nick && code) {
         var xhr = new XMLHttpRequest();
@@ -90,7 +99,7 @@ function verify() {
 
         xhr.send(JSON.stringify({ nick: nick, code: code }));
     } else {
-        alert('Enter nick and password.');
+        alert('Enter the correct code.');
     }
 }
 
@@ -103,9 +112,9 @@ function refreshAccessToken() {
     xhr.open('POST', hostAddress + '/refresh_token', true);
     xhr.setRequestHeader('Content-Type', 'application/json');
     var refreshToken = localStorage.getItem('refreshToken');
-    if (refreshToken === null){
+    if (refreshToken === null) {
         console.error('Refresh token is null!');
-        return
+        return;
     }
     xhr.send(JSON.stringify({ refresh_token: refreshToken }));
 
@@ -123,6 +132,18 @@ function refreshAccessToken() {
     };
 }
 
-function home() {
+function navigateToHome() {
     window.location = "index.html";
+} 
+
+function navigateToVerify() {
+    window.location = "verify.html";
+} 
+
+function navigateToRegister() {
+    window.location = "register.html";
+} 
+
+function navigateToLogin() {
+    window.location = "login.html";
 } 

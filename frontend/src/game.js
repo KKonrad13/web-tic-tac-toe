@@ -3,7 +3,7 @@ var hostAddress = 'http://localhost:8080';
 
 
 var parametr = window.location.search.substring(1);
-var playerNick = parametr.split('=')[1];
+var playerNick = localStorage.getItem('nick');
 var isAuthorized = true;
 let nIntervId;
 function getOpponent() {
