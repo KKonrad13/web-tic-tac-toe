@@ -1,5 +1,8 @@
 var hostAddress = 'http://localhost:8080';
 
+var nickToVerify = localStorage.getItem('nickToVerify');
+var nick = document.getElementById("nickInputVerify");
+nick.value = nickToVerify;
 
 function register() {
     var nick = document.getElementById('nickInputRegister').value;
@@ -71,11 +74,9 @@ function login() {
 }
 
 function verify() {
-    var nick = localStorage.getItem('nickToVerify');
-    var nickInput = document.getElementById("nickInputVerify");
-    nickInput.value = nick;
+    var nick = document.getElementById("nickInputVerify").value;
     var code = document.getElementById('codeInputVerify').value;
-    if (nickInput.value && code) {
+    if (nick && code) {
         var xhr = new XMLHttpRequest();
         xhr.open('POST', hostAddress + '/verify', true);
         xhr.setRequestHeader('Content-Type', 'application/json');
@@ -96,7 +97,7 @@ function verify() {
             }
         };
 
-        xhr.send(JSON.stringify({ nick: nickInput.value, code: code }));
+        xhr.send(JSON.stringify({ nick: nick, code: code }));
     } else {
         alert('Enter the correct code.');
     }
