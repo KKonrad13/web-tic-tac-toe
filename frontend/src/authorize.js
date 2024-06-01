@@ -72,12 +72,10 @@ function login() {
 
 function verify() {
     var nick = localStorage.getItem('nickToVerify');
-    if (nick === "" || nick === null && nick === "null"){
-        alert('ERROR. Nick not found.');
-        return;
-    }
+    var nickInput = document.getElementById("nickInputVerify").value;
+    nickInput = nick;
     var code = document.getElementById('codeInputVerify').value;
-    if (nick && code) {
+    if (nickInput && code) {
         var xhr = new XMLHttpRequest();
         xhr.open('POST', hostAddress + '/verify', true);
         xhr.setRequestHeader('Content-Type', 'application/json');
@@ -98,7 +96,7 @@ function verify() {
             }
         };
 
-        xhr.send(JSON.stringify({ nick: nick, code: code }));
+        xhr.send(JSON.stringify({ nick: nickInput, code: code }));
     } else {
         alert('Enter the correct code.');
     }
