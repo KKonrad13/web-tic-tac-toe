@@ -1,6 +1,5 @@
 var hostAddress = 'http://localhost:8080';
 
-document.getElementById('navigate_to_verify_button_div').innerHTML = "";
 
 function register() {
     var nick = document.getElementById('nickInputRegister').value;
@@ -16,7 +15,7 @@ function register() {
                 if (xhr.status === 200) {
                     alert("Register succesful");
                     localStorage.setItem('nickToVerify', nick);
-                    document.getElementById('navigate_to_verify_button_div').innerHTML = '<button class="button" onclick="navigateToVerify()">VERIFY</button>';
+                    navigateToVerify();
                 } else {
                     try {
                         var response = JSON.parse(xhr.responseText);
@@ -53,6 +52,7 @@ function login() {
                     localStorage.setItem('accessToken', accessToken);
                     localStorage.setItem('refreshToken', refreshToken);
                     scheduleRefreshToken(response.expiresIn)
+                    navigateToHome()
                 } else {
                     try {
                         var response = JSON.parse(xhr.responseText);
@@ -85,7 +85,8 @@ function verify() {
         xhr.onreadystatechange = function () {
             if (xhr.readyState === XMLHttpRequest.DONE) {
                 if (xhr.status === 200) {
-                    alert("Verification succesful")
+                    alert("Verification succesful");
+                    navigateToLogin();
                 } else {
                     try {
                         var response = JSON.parse(xhr.responseText);
