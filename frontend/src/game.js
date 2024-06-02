@@ -29,40 +29,49 @@ function getOpponent() {
                 if (players.p2 === null) {
                     document.getElementById('player_info').innerHTML = players.p1 + '\'s symbol: X';
                     document.getElementById('opponent_info').innerHTML = 'Waiting for an opponent...';
+                    setPlayerImage(players.p1);
                 }
                 else if (players.p2 === playerNick) {
                     document.getElementById('opponent_info').innerHTML = players.p1 + '\'s symbol: X';
                     document.getElementById('player_info').innerHTML = players.p2 + '\'s symbol: O';
+                    setPlayerImage(players.p2);
+                    setOpponentImage(players.p1);
                 }
                 else {
                     document.getElementById('player_info').innerHTML = players.p1 + '\'s symbol: X';
                     document.getElementById('opponent_info').innerHTML = players.p2 + '\'s symbol: O';
-                }
-
-                if (!playerImageAppended) {
-                    var playerImage = new Image();
-                    playerImage.src = hostAddress + '/image/' + players.p1;
-                    playerImage.style.maxWidth = '200px';
-                    playerImage.style.maxHeight = '200px';
-                    playerImage.onload = function () {
-                        document.getElementById('player_image').appendChild(playerImage);
-                    };
-                    playerImageAppended = true;
-                }
-                if (!opponentImageAppended) {
-                    var opponentImage = new Image();
-                    opponentImage.src = hostAddress + '/image/' + players.p2;
-                    opponentImage.style.maxWidth = '200px';
-                    opponentImage.style.maxHeight = '200px';
-                    opponentImage.onload = function () {
-                        document.getElementById('opponent_image').appendChild(opponentImage);
-                    };
-                    opponentImageAppended = true;
-
+                    setPlayerImage(players.p1);
+                    setOpponentImage(players.p2);
                 }
             }
         }
     };
+}
+
+function setOpponentImage(opponentNick) {
+    if (!opponentImageAppended) {
+        var opponentImage = new Image();
+        opponentImage.src = hostAddress + '/image/' + opponentNick;
+        opponentImage.style.maxWidth = '200px';
+        opponentImage.style.maxHeight = '200px';
+        opponentImage.onload = function () {
+            document.getElementById('opponent_image').appendChild(opponentImage);
+        };
+        opponentImageAppended = true;
+    }
+}
+
+function setPlayerImage(playerNick) {
+    if (!playerImageAppended) {
+        var playerImage = new Image();
+        playerImage.src = hostAddress + '/image/' + playerNick;
+        playerImage.style.maxWidth = '200px';
+        playerImage.style.maxHeight = '200px';
+        playerImage.onload = function () {
+            document.getElementById('player_image').appendChild(playerImage);
+        };
+        playerImageAppended = true;
+    }
 }
 
 
