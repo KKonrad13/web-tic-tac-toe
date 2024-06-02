@@ -4,6 +4,8 @@ var hostAddress = 'http://localhost:8080';
 
 var playerNick = localStorage.getItem('nick');
 var isAuthorized = true;
+var playerImageAppended = false;
+var opponentImageAppended = false;
 let nIntervId;
 function getOpponent() {
     var xhr = new XMLHttpRequest();
@@ -37,17 +39,27 @@ function getOpponent() {
                     document.getElementById('opponent_info').innerHTML = players.p2 + '\'s symbol: O';
                 }
 
-                var playerImage = new Image();
-                playerImage.src = hostAddress + '/image/' + players.p1;
-                playerImage.onload = function() {
-                    document.getElementById('player_image').appendChild(playerImage);
-                };
+                if (!playerImageAppended) {
+                    var playerImage = new Image();
+                    playerImage.src = hostAddress + '/image/' + players.p1;
+                    playerImage.style.maxWidth = '200px';
+                    playerImage.style.maxHeight = '200px';
+                    playerImage.onload = function () {
+                        document.getElementById('player_image').appendChild(playerImage);
+                    };
+                    playerImageAppended = true;
+                }
+                if (!opponentImageAppended) {
+                    var opponentImage = new Image();
+                    opponentImage.src = hostAddress + '/image/' + players.p2;
+                    opponentImage.style.maxWidth = '200px';
+                    opponentImage.style.maxHeight = '200px';
+                    opponentImage.onload = function () {
+                        document.getElementById('opponent_image').appendChild(opponentImage);
+                    };
+                    opponentImageAppended = true;
 
-                var opponentImage = new Image();
-                opponentImage.src = hostAddress + '/image/' + players.p2;
-                opponentImage.onload = function() {
-                    document.getElementById('opponent_image').appendChild(opponentImage);
-                };
+                }
             }
         }
     };
