@@ -246,7 +246,7 @@ def get_image_data(filename):
         response = s3_client.get_object(Bucket=S3_PROFILE_PICTURES, Key=filename)
         image_data = response["Body"].read()
         return (image_data, None)
-    except ClientError as e:
+    except Exception as e:
         return (None, str(e))
 
 
