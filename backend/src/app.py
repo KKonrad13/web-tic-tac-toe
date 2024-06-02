@@ -6,7 +6,7 @@ import boto3
 import jwt
 import requests
 from botocore.exceptions import ClientError
-from flask import Flask, jsonify, request
+from flask import Flask, Response, jsonify, request
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 from jwt import PyJWKClient
@@ -208,37 +208,16 @@ def logout():
 @app.route("/players", methods=["GET"])
 @token_required
 def get_players():
-    players_with_images = {}
+    return jsonify({"players": players})
 
-    p1_nick = players.get("p1")
-    if p1_nick:
-        p1_img_data, p1_img_error = get_image_data(f"{p1_nick}.png")
-        if not p1_img_error:
-            players_with_images["p1"] = {
-                "nickname": p1_nick,
-                "image_data": p1_img_data,
-            }
-        else:
-            players_with_images["p1"] = {
-                "nickname": p1_nick,
-                "error": p1_img_error,
-            }
 
-    p2_nick = players.get("p2")
-    if p2_nick:
-        p2_img_data, p2_img_error = get_image_data(f"{p2_nick}.png")
-        if not p2_img_error:
-            players_with_images["p2"] = {
-                "nickname": p2_nick,
-                "image_data": p2_img_data,
-            }
-        else:
-            players_with_images["p2"] = {
-                "nickname": p2_nick,
-                "error": p2_img_error,
-            }
-
-    return jsonify({"players": players_with_images})
+@app.route("/image/<player>", methods=["GET"])
+def get_player_image(player):
+    image_data, error_message = get_image_data(f"{player}.png")
+    if image_data:
+        return Response(image_data, mimetype="image/png")
+    else:
+        return error_message, 400
 
 
 def get_image_data(filename):
