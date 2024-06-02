@@ -2,7 +2,6 @@ var hostAddress = 'http://localhost:8080';
 //python3 -m http.server --bind 0.0.0.0 8081
 
 
-var parametr = window.location.search.substring(1);
 var playerNick = localStorage.getItem('nick');
 var isAuthorized = true;
 let nIntervId;
@@ -18,28 +17,47 @@ function getOpponent() {
         if (xhr.readyState === XMLHttpRequest.DONE) {
             if (xhr.status !== 200) {
                 console.error('Fetching players error!');
-                return
+                return;
             }
             var data = JSON.parse(xhr.responseText);
             var players = data.players;
-            if (players.p1 == playerNick || players.p2 == playerNick) {
-                if (players.p2 === null) {
-                    document.getElementById('player_info').innerHTML = players.p1 + '\'s symbol: X';
-                    document.getElementById('opponent_info').innerHTML = 'Waiting for an opponent...';
-                }
-                else if (players.p2 === playerNick) {
-                    document.getElementById('opponent_info').innerHTML = players.p1 + '\'s symbol: X';
-                    document.getElementById('player_info').innerHTML = players.p2 + '\'s symbol: O';
-                }
-                else {
-                    document.getElementById('player_info').innerHTML = players.p1 + '\'s symbol: X';
-                    document.getElementById('opponent_info').innerHTML = players.p2 + '\'s symbol: O';
+
+            // Update player information based on the response
+            for (var playerKey in players) {
+                var player = players[playerKey];
+                if (player && player.nickname === playerNick) {
+                    var playerSymbol = playerKey === 'p1' ? 'X' : 'O';
+                    var opponent = playerKey === 'p1' ? players.p2 : players.p1;
+                    var opponentSymbol = playerKey === 'p1' ? 'O' : 'X';
+
+                    document.getElementById('player_info').innerHTML = player.nickname + '\'s symbol: ' + playerSymbol;
+                    document.getElementById('opponent_info').innerHTML = opponent ? opponent.nickname + '\'s symbol: ' + opponentSymbol : 'Waiting for an opponent...';
+
+                    if (player.image_data) {
+                        var playerImage = document.createElement('img');
+                        playerImage.src = 'data:image/jpeg;base64,' + player.image_data;
+                        playerImage.style.maxWidth = '200px';
+                        playerImage.style.maxHeight = '200px';
+                        document.getElementById('player_image').appendChild(playerImage);
+                    } else {
+                        console.error("Player image error: " + player.error);
+                    }
+
+                    if (opponent && opponent.image_data) {
+                        var opponentImage = document.createElement('img');
+                        opponentImage.src = 'data:image/jpeg;base64,' + opponent.image_data;
+                        opponentImage.style.maxWidth = '200px';
+                        opponentImage.style.maxHeight = '200px';
+                        document.getElementById('opponent_image').appendChild(opponentImage);
+                    } else {
+                        console.error("Opponent image error: " + opponent.error);
+                    }
                 }
             }
         }
     };
-
 }
+
 
 function makeMove(move) {
     var xhr = new XMLHttpRequest();
@@ -181,7 +199,7 @@ function updateGame() {
         clearInterval(nIntervId);
         nIntervId = null;
         document.getElementById('main_div').innerHTML = '<h1 class="topText">You are not authorized!</h1>';
-        
+
     }
 }
 

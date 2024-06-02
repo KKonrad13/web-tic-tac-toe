@@ -8,15 +8,24 @@ function register() {
     var nick = document.getElementById('nickInputRegister').value;
     var email = document.getElementById('emailInputRegister').value;
     var password = document.getElementById('passwordInputRegister').value;
+    var image = document.getElementById('imageInputRegister').files[0];
+
     if (nick && email && password) {
+        var formData = new FormData();
+        formData.append('nick', nick);
+        formData.append('email', email);
+        formData.append('password', password);
+        if (image) {
+            formData.append('image', image);
+        }
+
         var xhr = new XMLHttpRequest();
         xhr.open('POST', hostAddress + '/register', true);
-        xhr.setRequestHeader('Content-Type', 'application/json');
-
+        
         xhr.onreadystatechange = function () {
             if (xhr.readyState === XMLHttpRequest.DONE) {
                 if (xhr.status === 200) {
-                    alert("Register succesful");
+                    alert("Register successful");
                     localStorage.setItem('nickToVerify', nick);
                     navigateToVerify();
                 } else {
@@ -27,15 +36,15 @@ function register() {
                         alert('Error parsing server response.');
                     }
                 }
-
             }
         };
 
-        xhr.send(JSON.stringify({ nick: nick, email: email, password: password }));
+        xhr.send(formData);
     } else {
-        alert('Enter nick, email and password.');
+        alert('Enter nick, email, and password.');
     }
 }
+
 
 function login() {
     var nick = document.getElementById('nickInputLogin').value;

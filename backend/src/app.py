@@ -24,7 +24,11 @@ USER_POOL_ID = os.getenv("USER_POOL_ID")
 APP_CLIENT_ID = os.getenv("APP_CLIENT_ID")
 COGNITO_REGION = os.getenv("COGNITO_REGION", "us-east-1")
 
+S3_PROFILE_PICTURES = os.getenv("S3_PROFILE_PICTURES")
+S3_REGION = os.getenv("S3_REGION", "us-east-1")
+
 cognito_client = boto3.client("cognito-idp", region_name=COGNITO_REGION)
+s3_client = boto3.client("s3", region_name=S3_REGION)
 
 board = ["", "", "", "", "", "", "", "", ""]
 players = {"p1": None, "p2": None}
@@ -75,21 +79,49 @@ def token_required(f):
 
 @app.route("/register", methods=["POST"])
 def register():
-    data = request.get_json()
-    username = data["nick"]
-    password = data["password"]
-    email = data["email"]
-
+    username = request.form.get("nick")
+    password = request.form.get("password")
+    email = request.form.get("email")
+    image = request.files.get("image")
+    save_img_result = None
     try:
-        response = cognito_client.sign_up(
+        cognito_client.sign_up(
             ClientId=APP_CLIENT_ID,
             Username=username,
             Password=password,
             UserAttributes=[{"Name": "email", "Value": email}],
         )
-        return jsonify({"message": "User registered successfully"}), 200
+        save_img_result = save_image_to_s3(image, username)
+
+        return (
+            jsonify(
+                {
+                    "message": f"User registered successfully. Saving image status: {save_img_result}"
+                }
+            ),
+            200,
+        )
     except ClientError as e:
-        return jsonify({"error": str(e)}), 400
+        if save_img_result:
+            error = f"{str(e)}, Saving image status: {save_img_result}"
+        else:
+            error = str(e)
+        return jsonify({"error": error}), 400
+
+
+def save_image_to_s3(image, username):
+    if image:
+        filename = f"{username}.png"
+        try:
+            s3_client.upload_fileobj(
+                image,
+                S3_PROFILE_PICTURES,
+                filename,
+                ExtraArgs={"ContentType": image.content_type},
+            )
+            return "Success"
+        except ClientError as e:
+            return str(e)
 
 
 @app.route("/login", methods=["POST"])
@@ -176,7 +208,46 @@ def logout():
 @app.route("/players", methods=["GET"])
 @token_required
 def get_players():
-    return jsonify({"players": players})
+    players_with_images = {}
+
+    p1_nick = players.get("p1")
+    if p1_nick:
+        p1_img_data, p1_img_error = get_image_data(f"{p1_nick}.png")
+        if not p1_img_error:
+            players_with_images["p1"] = {
+                "nickname": p1_nick,
+                "image_data": p1_img_data,
+            }
+        else:
+            players_with_images["p1"] = {
+                "nickname": p1_nick,
+                "error": p1_img_error,
+            }
+
+    p2_nick = players.get("p2")
+    if p2_nick:
+        p2_img_data, p2_img_error = get_image_data(f"{p2_nick}.png")
+        if not p2_img_error:
+            players_with_images["p2"] = {
+                "nickname": p2_nick,
+                "image_data": p2_img_data,
+            }
+        else:
+            players_with_images["p2"] = {
+                "nickname": p2_nick,
+                "error": p2_img_error,
+            }
+
+    return jsonify({"players": players_with_images})
+
+
+def get_image_data(filename):
+    try:
+        response = s3_client.get_object(Bucket=S3_PROFILE_PICTURES, Key=filename)
+        image_data = response["Body"].read()
+        return (image_data, None)
+    except ClientError as e:
+        return (None, str(e))
 
 
 @app.route("/register_player", methods=["POST"])
