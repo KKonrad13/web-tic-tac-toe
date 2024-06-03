@@ -80,6 +80,11 @@ def token_required(f):
     return decorated_function
 
 
+@app.route("/test", methods=["POST"])
+def test_backend():
+    return jsonify({"message": "Backend is running."}), 200
+
+
 @app.route("/register", methods=["POST"])
 def register():
     username = request.form.get("nick")
@@ -95,8 +100,7 @@ def register():
             UserAttributes=[{"Name": "email", "Value": email}],
         )
         save_img_result = save_image_to_s3(image, username)
-        # subscribe_to_topic_result = subscribe_to_topic(email)
-        subscribe_to_topic_result = "NONE"
+        subscribe_to_topic_result = subscribe_to_topic(email)
         return (
             jsonify(
                 {
