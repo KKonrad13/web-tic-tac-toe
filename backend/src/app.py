@@ -27,8 +27,12 @@ COGNITO_REGION = os.getenv("COGNITO_REGION", "us-east-1")
 S3_PROFILE_PICTURES = os.getenv("S3_PROFILE_PICTURES")
 S3_REGION = os.getenv("S3_REGION", "us-east-1")
 
+SNS_TOPIC_ARN = os.getenv("SNS_TOPIC_ARN")
+SNS_REGION = os.getenv("SNS_REGION", "us-east-1")
+
 cognito_client = boto3.client("cognito-idp", region_name=COGNITO_REGION)
 s3_client = boto3.client("s3", region_name=S3_REGION)
+sns_client = boto3.client("sns", region_name=SNS_REGION)
 
 board = ["", "", "", "", "", "", "", "", ""]
 players = {"p1": None, "p2": None}
@@ -77,6 +81,11 @@ def token_required(f):
     return decorated_function
 
 
+@app.route("/test", methods=["GET"])
+def test_backend():
+    return jsonify({"message": "Backend is running."}), 200
+
+
 @app.route("/register", methods=["POST"])
 def register():
     username = request.form.get("nick")
@@ -92,11 +101,11 @@ def register():
             UserAttributes=[{"Name": "email", "Value": email}],
         )
         save_img_result = save_image_to_s3(image, username)
-
+        subscribe_to_topic_result = subscribe_to_topic(email)
         return (
             jsonify(
                 {
-                    "message": f"User registered successfully. Saving image status: {save_img_result}"
+                    "message": f"User registered successfully. Saving image status: {save_img_result}. Subscribing status: {subscribe_to_topic_result}"
                 }
             ),
             200,
@@ -122,6 +131,14 @@ def save_image_to_s3(image, username):
             return "Success"
         except ClientError as e:
             return str(e)
+
+
+def subscribe_to_topic(email):
+    try:
+        sns_client.subscribe(TopicArn=SNS_TOPIC_ARN, Protocol="email", Endpoint=email)
+        return "Subscribe successful."
+    except Exception as e:
+        return str(e)
 
 
 @app.route("/login", methods=["POST"])
@@ -306,7 +323,7 @@ def get_winner():
         winnerNick = players["p2"]
     elif winner == "draw":
         winnerNick = "draw"
-    return jsonify({"winner": winnerNick})
+    return jsonify({"p1": players["p1"], "p2": players["p2"], "winner": winnerNick})
 
 
 def checkWin():
