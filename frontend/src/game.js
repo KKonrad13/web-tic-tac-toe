@@ -176,9 +176,9 @@ function sendResultToLambda(player1nick, player2nick, result){
     xhrLambda.setRequestHeader('Content-Type', 'application/json');
     console.debug("API_URL" + API_URL);
     var data = JSON.stringify({
-        "player_1": player1nick,
-        "player_2": player2nick,
-        "result": result
+        "\"player_1\"": player1nick,
+        "\"player_2\"": player2nick,
+        "\"result\"": result
     });
 
     xhrLambda.send(data);
