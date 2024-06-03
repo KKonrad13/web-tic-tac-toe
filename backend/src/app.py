@@ -27,7 +27,7 @@ COGNITO_REGION = os.getenv("COGNITO_REGION", "us-east-1")
 S3_PROFILE_PICTURES = os.getenv("S3_PROFILE_PICTURES")
 S3_REGION = os.getenv("S3_REGION", "us-east-1")
 
-SNS_TOPIC_ARN = os.getenv("SNS_TOPIC_ARN", "us-east-1")
+SNS_TOPIC_ARN = os.getenv("SNS_TOPIC_ARN")
 
 cognito_client = boto3.client("cognito-idp", region_name=COGNITO_REGION)
 s3_client = boto3.client("s3", region_name=S3_REGION)
@@ -95,7 +95,8 @@ def register():
             UserAttributes=[{"Name": "email", "Value": email}],
         )
         save_img_result = save_image_to_s3(image, username)
-        subscribe_to_topic_result = subscribe_to_topic(email)
+        # subscribe_to_topic_result = subscribe_to_topic(email)
+        subscribe_to_topic_result = "NONE"
         return (
             jsonify(
                 {
