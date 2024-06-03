@@ -26,6 +26,8 @@ function register() {
             if (xhr.readyState === XMLHttpRequest.DONE) {
                 if (xhr.status === 200) {
                     alert("Register successful");
+                    var data = JSON.parse(xhr.responseText);
+                    console.debug(data.message);
                     localStorage.setItem('nickToVerify', nick);
                     navigateToVerify();
                 } else {

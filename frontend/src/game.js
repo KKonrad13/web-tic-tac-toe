@@ -1,11 +1,12 @@
 var hostAddress = 'http://localhost:8080';
 //python3 -m http.server --bind 0.0.0.0 8081
-
+var API_URL = "API_GATEWAY_URL";
 
 var playerNick = localStorage.getItem('nick');
 var isAuthorized = true;
 var playerImageAppended = false;
 var opponentImageAppended = false;
+var gameFinished = false;
 let nIntervId;
 function getOpponent() {
     var xhr = new XMLHttpRequest();
@@ -132,6 +133,9 @@ function renderBoard(board) {
 }
 
 function checkWin() {
+    if (gameFinished){
+        return;
+    }
     var xhr = new XMLHttpRequest();
     xhr.open('GET', hostAddress + '/winner', true);
     xhr.setRequestHeader('Content-Type', 'application/json');
@@ -148,6 +152,9 @@ function checkWin() {
             }
             var data = JSON.parse(xhr.responseText);
             var winner = data.winner;
+            if (winner != 'None'){
+                sendResultToLambda(data.p1, data.p2, data.winner)
+            }
             if (winner == playerNick) {
                 document.getElementById('topInfo').innerHTML = 'You won!';
             }
@@ -160,6 +167,31 @@ function checkWin() {
         }
     };
 
+}
+
+function sendResultToLambda(player1nick, player2nick, result){
+    gameFinished = true;
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', API_URL + '/game_ended', true);
+    xhr.setRequestHeader('Content-Type', 'application/json');
+
+    var data = JSON.stringify({
+        "player_1": player1nick,
+        "player_2": player2nick,
+        "result": result
+    });
+
+    xhr.send(data);
+
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState === XMLHttpRequest.DONE) {
+            if (xhr.status !== 200) {
+                console.error('Error sending result.');
+                return;
+            }
+            console.log('Result sent successfully');
+        }
+    };
 }
 
 function endGame() {

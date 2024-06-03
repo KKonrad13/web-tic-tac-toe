@@ -7,6 +7,7 @@ services:
       dockerfile: Dockerfile
       args:
         - IP=${IP}
+        - API_GATEWAY_URL=${API_GATEWAY_URL}
     ports:
       - 8081:3000
   backend:
@@ -22,3 +23,4 @@ services:
       - COGNITO_REGION=${COGNITO_REGION}
       - S3_REGION=${S3_REGION}
       - S3_PROFILE_PICTURES=${S3_PROFILE_PICTURES}
+      - SNS_TOPIC_ARN=${SNS_TOPIC_ARN}
