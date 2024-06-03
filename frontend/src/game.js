@@ -239,9 +239,11 @@ function checkEndGame() {
 }
 
 function updateGame() {
-    checkWin()
-    getOpponent()
-    updateBoard()
+    if(!gameFinished){
+        checkWin()
+        getOpponent()
+        updateBoard()
+    }
     checkEndGame()
     if (!isAuthorized) {
         clearInterval(nIntervId);
