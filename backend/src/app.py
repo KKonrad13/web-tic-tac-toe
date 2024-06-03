@@ -80,7 +80,7 @@ def token_required(f):
     return decorated_function
 
 
-@app.route("/test", methods=["POST"])
+@app.route("/test", methods=["GET"])
 def test_backend():
     return jsonify({"message": "Backend is running."}), 200
 
