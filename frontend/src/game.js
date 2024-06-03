@@ -152,8 +152,8 @@ function checkWin() {
             }
             var data = JSON.parse(xhr.responseText);
             var winner = data.winner;
-            if (winner != 'None'){
-                sendResultToLambda(data.p1, data.p2, data.winner)
+            if (winner == playerNick || (winner == 'draw' && data.p1 == playerNick)){
+                sendResultToLambda(data.p1, data.p2, data.winner);
             }
             if (winner == playerNick) {
                 document.getElementById('topInfo').innerHTML = 'You won!';
@@ -171,21 +171,21 @@ function checkWin() {
 
 function sendResultToLambda(player1nick, player2nick, result){
     gameFinished = true;
-    var xhr = new XMLHttpRequest();
-    xhr.open('POST', API_URL + '/game_ended', true);
-    xhr.setRequestHeader('Content-Type', 'application/json');
-
+    var xhrLambda = new XMLHttpRequest();
+    xhrLambda.open('POST', API_URL + '/game_ended', true);
+    xhrLambda.setRequestHeader('Content-Type', 'application/json');
+    console.debug("API_URL" + API_URL);
     var data = JSON.stringify({
         "player_1": player1nick,
         "player_2": player2nick,
         "result": result
     });
 
-    xhr.send(data);
+    xhrLambda.send(data);
 
-    xhr.onreadystatechange = function () {
-        if (xhr.readyState === XMLHttpRequest.DONE) {
-            if (xhr.status !== 200) {
+    xhrLambda.onreadystatechange = function () {
+        if (xhrLambda.readyState === XMLHttpRequest.DONE) {
+            if (xhrLambda.status !== 200) {
                 console.error('Error sending result.');
                 return;
             }
