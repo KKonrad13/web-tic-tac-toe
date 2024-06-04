@@ -75,6 +75,13 @@ th {
 }
 
 .no-data {
+    color: rgb(255, 255, 255);
+    font-size: 60px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 100px;
+    margin-top: 80px;
     text-align: center;
     font-style: italic;
 }
