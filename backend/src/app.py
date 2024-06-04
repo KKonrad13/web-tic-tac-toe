@@ -29,11 +29,12 @@ SNS_TOPIC_ARN = os.getenv("SNS_TOPIC_ARN")
 SNS_REGION = os.getenv("SNS_REGION", "us-east-1")
 
 DB_TABLE_NAME = os.getenv("DB_TABLE_NAME")
+DB_REGION = os.getenv("SNS_REGION", "us-east-1")
 
 cognito_client = boto3.client("cognito-idp", region_name=COGNITO_REGION)
 s3_client = boto3.client("s3", region_name=S3_REGION)
 sns_client = boto3.client("sns", region_name=SNS_REGION)
-dynamodb = boto3.resource("dynamodb")
+dynamodb = boto3.resource("dynamodb", region_name=DB_REGION)
 
 ranking_table = dynamodb.Table(DB_TABLE_NAME)
 
