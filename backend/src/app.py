@@ -352,22 +352,25 @@ def checkWin():
 
 @app.route("/get_rankings", methods=["GET"])
 def get_rankings():
-    response = ranking_table.scan()
-    players = response["Items"]
-    sorted_players = sorted(players, key=lambda x: x["result"], reverse=True)
+    try:
+        response = ranking_table.scan()
+        players = response["Items"]
+        sorted_players = sorted(players, key=lambda x: x["result"], reverse=True)
 
-    rank = 1
-    previous_wins = -1
-    current_rank = 0
+        rank = 1
+        previous_wins = -1
+        current_rank = 0
 
-    for player in sorted_players:
-        if player["wins"] != previous_wins:
-            current_rank = rank
-            previous_wins = player["wins"]
-        player["rank"] = current_rank
-        rank += 1
+        for player in sorted_players:
+            if player["result"] != previous_wins:
+                current_rank = rank
+                previous_wins = player["result"]
+            player["result"] = current_rank
+            rank += 1
 
-    return jsonify(sorted_players)
+        return jsonify(sorted_players), 200
+    except Exception as e:
+        return jsonify({"message": str(e)}), 500
 
 
 def win_horizontally(i):
