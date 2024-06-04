@@ -1,10 +1,8 @@
 import os
-import random
 from functools import wraps
 
 import boto3
 import jwt
-import requests
 from botocore.exceptions import ClientError
 from flask import Flask, Response, jsonify, request
 from flask_cors import CORS
@@ -30,9 +28,14 @@ S3_REGION = os.getenv("S3_REGION", "us-east-1")
 SNS_TOPIC_ARN = os.getenv("SNS_TOPIC_ARN")
 SNS_REGION = os.getenv("SNS_REGION", "us-east-1")
 
+DB_TABLE_NAME = os.getenv("DB_TABLE_NAME")
+
 cognito_client = boto3.client("cognito-idp", region_name=COGNITO_REGION)
 s3_client = boto3.client("s3", region_name=S3_REGION)
 sns_client = boto3.client("sns", region_name=SNS_REGION)
+dynamodb = boto3.resource("dynamodb")
+
+ranking_table = dynamodb.Table(DB_TABLE_NAME)
 
 board = ["", "", "", "", "", "", "", "", ""]
 players = {"p1": None, "p2": None}
@@ -344,6 +347,27 @@ def checkWin():
     if "" not in board:
         winner = "draw"
         game_locked = True
+
+
+@app.route("/get_rankings", methods=["GET"])
+def get_rankings():
+    # Pobierz wszystkich graczy i posortuj wg liczby wygranych
+    response = ranking_table.scan()
+    players = response["Items"]
+    sorted_players = sorted(players, key=lambda x: x["result"], reverse=True)
+
+    rank = 1
+    previous_wins = -1
+    current_rank = 0
+
+    for player in sorted_players:
+        if player["wins"] != previous_wins:
+            current_rank = rank
+            previous_wins = player["wins"]
+        player["rank"] = current_rank
+        rank += 1
+
+    return jsonify(sorted_players)
 
 
 def win_horizontally(i):

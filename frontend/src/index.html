@@ -15,7 +15,7 @@
         <div id="play_button_div"></div>
         <div id="authorize_button_div"></div>
         <div id="logout_button_div"></div>
-
+        <button class="button" onclick="ranking()">RANKING</button>
     </div>
 
     <script>
@@ -109,6 +109,10 @@
             };
 
             xhr.send(JSON.stringify({ access_token: access_token }));
+        }
+
+        function ranking() {
+            window.location = "ranking.html";
         }
 
         function authorize() {
