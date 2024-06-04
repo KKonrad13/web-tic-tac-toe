@@ -365,7 +365,7 @@ def get_rankings():
             if player["result"] != previous_wins:
                 current_rank = rank
                 previous_wins = player["result"]
-            player["result"] = current_rank
+            player["rank"] = current_rank
             rank += 1
 
         return jsonify(sorted_players), 200
