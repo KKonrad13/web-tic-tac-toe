@@ -26,3 +26,4 @@ services:
       - SNS_TOPIC_ARN=${SNS_TOPIC_ARN}
       - SNS_REGION=${SNS_REGION}
       - DB_TABLE_NAME=${DB_TABLE_NAME}
+      - DB_REGION=${DB_REGION}
