@@ -351,7 +351,6 @@ def checkWin():
 
 @app.route("/get_rankings", methods=["GET"])
 def get_rankings():
-    # Pobierz wszystkich graczy i posortuj wg liczby wygranych
     response = ranking_table.scan()
     players = response["Items"]
     sorted_players = sorted(players, key=lambda x: x["result"], reverse=True)
