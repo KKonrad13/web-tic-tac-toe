@@ -61,6 +61,7 @@ table {
     width: 50%;
     border-collapse: collapse;
     margin: 50px auto;
+    color: rgb(255, 255, 255);
 }
 
 th,
@@ -68,10 +69,12 @@ td {
     padding: 10px;
     text-align: left;
     border: 1px solid #ddd;
+    font-weight: bold;
+    color: rgb(255, 255, 255);
 }
 
 th {
-    background-color: #f2f2f2;
+    background-color: #121212;
 }
 
 .no-data {

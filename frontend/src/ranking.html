@@ -24,6 +24,7 @@
 
             </tbody>
         </table>
+        <div id="ranking_info_div"></div>
     </div>
     <script>
         var hostAddress = 'http://localhost:8080';
@@ -39,13 +40,7 @@
                     var tableBody = document.getElementById("rankingTableBody");
 
                     if (rankingData.length === 0) {
-                        var noDataRow = document.createElement("tr");
-                        var noDataCell = document.createElement("td");
-                        noDataCell.textContent = "RANKING IS EMPTY";
-                        noDataCell.colSpan = 3;
-                        noDataCell.classList.add("no-data");
-                        noDataRow.appendChild(noDataCell);
-                        tableBody.appendChild(noDataRow);
+                        document.getElementById("ranking_info_div").innerHTML = '<h2 class="no-data">RANKING IS EMPTY</h2>';
                     } else {
                         rankingData.forEach(function (player) {
                             var row = document.createElement("tr");
